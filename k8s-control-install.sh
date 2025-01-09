@@ -90,23 +90,37 @@ setup_worker_node() {
     eval "sudo $join_command"
 }
 
+# Function to uninstall Kubernetes
+uninstall_kubernetes() {
+    echo "Uninstalling Kubernetes..."
+    sudo kubeadm reset -f
+    sudo apt purge kubeadm kubelet kubectl docker.io -y
+    sudo apt autoremove -y
+    sudo rm -rf /etc/kubernetes /var/lib/etcd /var/lib/kubelet /var/lib/dockershim /etc/cni /opt/cni
+    sudo rm -rf ~/.kube
+    echo "Kubernetes has been uninstalled."
+}
+
 # Main script logic
 clear
-echo "Choose the node type to configure:"
-echo "1. Control Plane Node"
-echo "2. Worker Node"
-read -p "Enter your choice (1 or 2): " node_type
+echo "Choose an option:"
+echo "1. Install Control Plane Node"
+echo "2. Install Worker Node"
+echo "3. Uninstall Kubernetes"
+read -p "Enter your choice (1, 2, or 3): " option
 
-if [[ "$node_type" == "1" ]]; then
+if [[ "$option" == "1" ]]; then
     install_common_dependencies
     setup_control_plane
-elif [[ "$node_type" == "2" ]]; then
+elif [[ "$option" == "2" ]]; then
     install_common_dependencies
     setup_worker_node
+elif [[ "$option" == "3" ]]; then
+    uninstall_kubernetes
 else
     echo "Invalid choice. Exiting."
     exit 1
 fi
 
 # Script complete
-echo "Kubernetes installation complete for the selected node type."
+echo "Operation complete."
